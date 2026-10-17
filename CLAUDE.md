@@ -29,22 +29,28 @@ The frontend calls the backend over HTTP; the backend is the only layer that tal
 
 ## Database schema
 
-Four tables. Column names here are the intended design; keep migrations and seed data consistent with them.
+Four tables, defined in `backend/db/schema.sql`. Column names here are the intended design; keep migrations and seed data consistent with them.
+
+The schema deliberately keeps constraints light: there are no foreign keys, `NOT NULL`s, `UNIQUE`s, or `created_at` defaults beyond what's listed below. **Application code is responsible for data validity**, including:
+- setting `created_at` on every insert (use `now()` in the SQL),
+- only inserting ids that exist in the referenced table,
+- keeping each user's `rank_position` values unique and contiguous,
+- not adding the same restaurant to a user's list twice.
 
 ### `users`
-| Column       | Type        | Notes              |
-|--------------|-------------|--------------------|
-| `id`         | SERIAL PK   |                    |
-| `username`   | TEXT        | UNIQUE, NOT NULL   |
-| `display_name` | TEXT      |                    |
-| `created_at` | TIMESTAMPTZ | default `now()`    |
+| Column       | Type        | Notes                             |
+|--------------|-------------|-----------------------------------|
+| `id`         | SERIAL PK   |                                   |
+| `username`   | TEXT        | should be unique (enforced by app)|
+| `display_name` | TEXT      |                                   |
+| `created_at` | TIMESTAMPTZ | set by app on insert              |
 
 ### `follows`
 | Column        | Type        | Notes                         |
 |---------------|-------------|-------------------------------|
-| `follower_id` | INT FK → users.id | the user doing the following |
-| `followee_id` | INT FK → users.id | the user being followed      |
-| `created_at`  | TIMESTAMPTZ | default `now()`               |
+| `follower_id` | INT (→ users.id) | the user doing the following |
+| `followee_id` | INT (→ users.id) | the user being followed      |
+| `created_at`  | TIMESTAMPTZ | set by app on insert          |
 
 - PK `(follower_id, followee_id)`
 - CHECK `follower_id <> followee_id` (a user can't follow themselves)
@@ -64,13 +70,10 @@ Four tables. Column names here are the intended design; keep migrations and seed
 | Column          | Type        | Notes                                  |
 |-----------------|-------------|----------------------------------------|
 | `id`            | SERIAL PK   |                                        |
-| `user_id`       | INT FK → users.id |                                  |
-| `restaurant_id` | INT FK → restaurants.id |                            |
-| `rank_position` | INT         | 1 = favorite; contiguous per user      |
-| `created_at`    | TIMESTAMPTZ | when it was added; drives the feed     |
-
-- UNIQUE `(user_id, restaurant_id)`: a restaurant appears at most once per user's list.
-- UNIQUE `(user_id, rank_position)`, DEFERRABLE INITIALLY DEFERRED so positions can be shifted inside one transaction.
+| `user_id`       | INT (→ users.id) |                                   |
+| `restaurant_id` | INT (→ restaurants.id) |                             |
+| `rank_position` | INT         | 1 = favorite; contiguous per user (enforced by app) |
+| `created_at`    | TIMESTAMPTZ | when it was added; drives the feed; set by app on insert |
 
 The feed has no separate posts table: it comes from `user_rankings` joined with `follows`, ordered by `created_at DESC`.
 
