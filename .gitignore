@@ -1,0 +1,14 @@
+# Local config (holds DATABASE_URL)
+.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Node / React
+node_modules/
+
+# macOS
+.DS_Store
