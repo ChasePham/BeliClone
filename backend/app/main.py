@@ -20,7 +20,8 @@ def main():
 
 
 # TODO: (later) enable CORS for the React app
-# Run command and port note: specs/backend_api_feature.md section 3.
+# Run from backend/: `venv/bin/python -m app.main` (port 5001; see "Commands" in CLAUDE.md).
+# Endpoint behavior: openspec/changes/add-backend-api-routes/specs/ (openspec/specs/ once archived).
 
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
