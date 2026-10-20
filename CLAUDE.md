@@ -116,7 +116,24 @@ BeliClone/
 
 ## Commands
 
-_To be filled in once the backend and frontend are scaffolded (setup, run, seed, test)._
+Backend (run from `backend/`):
+
+```bash
+# Setup (once)
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
+cp .env.example .env            # then set DATABASE_URL (local database is named "Beli")
+
+# Reset and seed the database (re-runnable)
+psql -d Beli -f db/schema.sql -f db/seed.sql
+
+# Run the API on http://localhost:5001
+venv/bin/python -m app.main
+```
+
+There's no automated test suite yet. Verify endpoints with `curl` against freshly seeded data, using the scenarios in the specs as the checklist (e.g. `curl "localhost:5001/restaurants?q=golden"`).
+
+_Frontend commands to be filled in once it's scaffolded._
 
 ## Conventions
 
