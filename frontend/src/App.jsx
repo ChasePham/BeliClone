@@ -1,5 +1,8 @@
 import { useState, useEffect} from 'react'
 import {getUsers, getRankings} from './api.js'
+import RankingsList from './components/RankingsList.jsx'
+import UserSwitcher from './components/UserSwitcher.jsx'
+import RestaurantsList from './components/RestaurantsList.jsx'
 import './App.css'
 
 function App() {
@@ -20,25 +23,15 @@ function App() {
     <>
       <h1>Beli Clone</h1>
       <p>{users.length} users</p>
-      <select
-        value = {currentUserId}
-        onChange = {(event) => setCurrentUserId(Number(event.target.value))}
-      >
-        {
-          users.map((user) => {
-            return <option key = {user.id} value = {user.id}>{user['display_name']}</option>
-          })
-        }
-      </select>
+      <UserSwitcher
+        users = {users}
+        currentUserId = {currentUserId}
+        onChange = {setCurrentUserId}
+      />
       <p>Current user id: {currentUserId}</p>
       <p>Rankings for user:</p>
-      <ul>
-        {
-          rankings.map((ranking) => {
-            return <li key = {ranking.restaurant_id}>{ranking.rank_position}. {ranking.name} ({ranking.score})</li>
-          })
-        }
-      </ul>
+      <RankingsList rankings = {rankings} />
+      <RestaurantsList></RestaurantsList>
     </>
   )
 }
