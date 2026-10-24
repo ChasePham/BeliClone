@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import {searchRestaurants} from '../api.js'
 
-function RestaurantsList() {
+
+function RestaurantsList({addRestaurant}) {
     const [restaurants, setRestaurants] = useState([])
     const [search, setSearch] = useState("")
 
@@ -10,11 +11,20 @@ function RestaurantsList() {
         event.preventDefault()  // stop the browser from reloading the page
         searchRestaurants(search).then(setRestaurants)
     }
+    function handleClick(restaurant) {
+        console.log("user selected restaurant for ranking:", restaurant)
+        addRestaurant(restaurant)
+    }
 
     // Build one <li> per restaurant; React renders the whole array below.
     const items = []
     for (const restaurant of restaurants) {
-        items.push(<li key = {restaurant.id}>{restaurant.name} ({restaurant.cuisine}, {restaurant.city})</li>)
+        items.push(
+        <li key = {restaurant.id}>
+            {restaurant.name} ({restaurant.cuisine}, {restaurant.city})
+            <button onClick= {() => {handleClick(restaurant)}}>Add</button>
+            
+        </li>)
     }
 
     return(<>
